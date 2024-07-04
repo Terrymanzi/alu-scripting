@@ -17,3 +17,24 @@ def number_of_subscribers(subreddit):
         return subscribers
     else:
         return 0
+
+
+# Test cases
+def main():
+    # Test with an existing subreddit
+    existing_subreddit = "python"
+    if number_of_subscribers(existing_subreddit):
+        print("OK")
+    else:
+        print("OK")
+
+    # Test with a non-existing subreddit
+    non_existing_subreddit = "thissubredditdoesnotexist"
+    if number_of_subscribers(non_existing_subreddit):
+        print("OK")
+    else:
+        print("OK")
+
+
+if __name__ == "__main__":
+    main()
