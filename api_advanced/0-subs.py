@@ -6,7 +6,10 @@ the number of subscribers for a given subreddit.
 """
 
 import requests
+"""
+function Prototype: def number_of_subscribers(subreddit)
 
+"""
 
 def number_of_subscribers(subreddit):
     """
