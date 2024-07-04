@@ -2,6 +2,10 @@
 
 """
 This module retrieves the number of subscribers for a given subreddit.
+
+Usage:
+    - Import the module and call the function `number_of_subscribers(subreddit)` with the subreddit name as the argument.
+    - If run as a script, it will prompt the user to enter a subreddit name and display the number of subscribers.
 """
 
 import requests
