@@ -16,7 +16,3 @@ def number_of_subscribers(subreddit):
         return results.get("subscribers", 0)
     else:
         return 0
-
-# Example usage
-subreddit = "learnpython"
-print(f"Number of subscribers in r/{subreddit}: {number_of_subscribers(subreddit)}")
