@@ -1,47 +1,77 @@
 #!/usr/bin/python3
-"""
-Function to count words in all hot posts of a given Reddit subreddit.
-"""
+"""A script that counts the number of occurrences of list of words
+in a given subreddit."""
+
+from audioop import reverse
 import requests
 
+headers = {'User-Agent': 'MyAPI/0.0.1'}
 
-def count_words(subreddit, word_list, after=None, counts={}):
-    """
-    Recursive function that queries the Reddit API, parses the title of all
-        hot articles, and prints a sorted count of given keywords
-    """
-    if not word_list or word_list == [] or not subreddit:
-        return
 
-    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
-    headers = {"User-Agent": "Mozilla/5.0"}
+def count_words(subreddit, word_list, after="", hot_list=[]):
+    """print the sorted count of word_list."""
 
-    params = {"limit": 100}
-    if after:
-        params["after"] = after
+    subreddit_url = "https://reddit.com/r/{}/hot.json".format(subreddit)
 
-    response = requests.get(url,
-                            headers=headers,
-                            params=params,
-                            allow_redirects=False)
+    parameters = {'limit': 100, 'after': after}
+    response = requests.get(subreddit_url, headers=headers, params=parameters)
 
-    if response.status_code != 200:
-        return
+    if response.status_code == 200:
 
-    data = response.json()
-    children = data["data"]["children"]
+        # print(response.status_code)
+        json_data = response.json()
+        if (json_data.get('data').get('dist') == 0):
+            return
+        # get the 'after' value from the response to pass it on the request
 
-    for post in children:
-        title = post["data"]["title"].lower()
-        for word in word_list:
-            if word.lower() in title:
-                counts[word] = counts.get(word, 0) + title.count(word.lower())
+        # get title and append it to the hot_list
+        for child in json_data.get('data').get('children'):
+            title = child.get('data').get('title')
+            hot_list.append(title)
 
-    after = data["data"]["after"]
-    if after:
-        count_words(subreddit, word_list, after, counts)
+        # variable after indicates if there is data on the next pagination
+        # on the reddit API after holds a unique name for that subreddit page.
+        # if it is None it indicates it is the last page.
+        after = json_data.get('data').get('after')
+        if after is not None:
+            # print("got next page")
+            # print(len(hot_list))
+            return count_words(subreddit, word_list,
+                               after=after, hot_list=hot_list)
+        else:
+            # put the initial words counter dictionary
+            counter = {}
+            for word in word_list:
+                word = word.lower()
+                if word not in counter.keys():
+                    counter[word] = 0
+                else:
+                    counter[word] += 1
+            # loop through the hot_list to check if word is found in the list
+            for title in hot_list:
+                title_list = title.lower().split(' ')
+                for word in counter.keys():
+                    search_word = "{}".format(word)
+                    if search_word in title_list:
+                        counter[word] += 1
+            sorted_counter = dict(
+                sorted(counter.items(),
+                       key=lambda item: item[1], reverse=True))
+            for key, value in sorted_counter.items():
+                if value > 0:
+                    print("{}: {}".format(key, value))
+            # print(hot_list)
+
     else:
-        sorted_counts = sorted(counts.items(),
-                               key=lambda x: (-x[1], x[0].lower()))
-        for word, count in sorted_counts:
-            print(f"{word.lower()}: {count}")
+        return
+
+
+if __name__ == '__main__':
+    count_words("hello", ['REDDIT', 'german', 'HI', 'whynot'])
+    count_words('unpopular', ['down', 'vote', 'downvote',
+                              'you', 'her', 'unpopular', 'politics'])
+    # count_words("hello", ['hello', 'hello', 'hello'])
+    # count_words("unpopular", ["react", "python", "java",
+    # "javascript", "scala", "no_result_for_this"])
+
+    # count_words('hello', ['hello', 'hello', 'hello'])
