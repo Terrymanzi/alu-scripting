@@ -1,19 +1,15 @@
 #!/usr/bin/python3
-"""Script that queries subscribers on a given Reddit subreddit."""
+"""Return number of subscribers for a given subreddit"""
 import requests
 
 
 def number_of_subscribers(subreddit):
-    """Return the total number of subscribers on a given subreddit."""
-    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
-    headers = {
-        "User-Agent": "Mozilla/5.0 (compatible; Python script)"
-    }
-    response = requests.get(url, headers=headers, allow_redirects=False)
-    if response.status_code == 404:
-        return 0
-    elif response.status_code == 200:
-        results = response.json().get("data")
-        return results.get("subscribers", 0)
-    else:
-        return 0
+    """Return the number of subscribers """
+    url = "https://www.reddit.com/r/{}/about.json" \
+        .format(subreddit)
+    headers = {'User-Agent': 'My User Agent 1.0'}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json().get('data') \
+            .get('subscribers')
+    return 0
